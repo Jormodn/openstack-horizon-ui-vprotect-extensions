@@ -1,11 +1,14 @@
 
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 
 import os
 import shutil
 import sys
 import yaml
-import requests, zipfile, io
+import io
+import zipfile
+
+import requests
 from distutils.dir_util import copy_tree
 
 
