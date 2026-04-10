@@ -1,11 +1,28 @@
 import json
+import os
+from glob import glob
 import requests
 import yaml
 from django.http import HttpResponse, JsonResponse
 from django.views import generic
 from urllib.parse import unquote
 
-CONFIG = yaml.safe_load(open('/var/lib/kolla/venv/lib/python3.12/site-packages/openstack_dashboard/dashboards/vprotect/config.yaml', 'r'))
+
+def load_config():
+    config_paths = [
+        '/usr/share/openstack-dashboard/openstack_dashboard/dashboards/vprotect/config.yaml',
+    ]
+    config_paths.extend(sorted(glob('/var/lib/kolla/venv/lib/python3*/site-packages/openstack_dashboard/dashboards/vprotect/config.yaml')))
+
+    for config_path in config_paths:
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as config_file:
+                return yaml.safe_load(config_file)
+
+    raise FileNotFoundError('vProtect config.yaml not found in known locations')
+
+
+CONFIG = load_config()
 VPROTECT_API_URL = CONFIG['REST_API_URL']
 USER = CONFIG['USER']
 PASSWORD = CONFIG['PASSWORD']
